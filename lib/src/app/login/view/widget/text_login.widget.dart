@@ -8,7 +8,7 @@ class TextLoginWidget extends StatelessWidget {
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 20),
       child: Text(
-        'WELCOME TO TORTIMAZER 2.0',
+        'WELCOME TO TORTIMAZER 3.0',
         style: TextStyle(
           fontSize: 35,
           fontWeight: FontWeight.bold,

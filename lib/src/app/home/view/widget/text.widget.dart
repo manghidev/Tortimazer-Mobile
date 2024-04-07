@@ -16,7 +16,7 @@ class TextWidget extends StatelessWidget {
         children: [
           LogoWidget(),
           Text(
-            'Tortimazer 2.0',
+            'Tortimazer 3.0',
             overflow: TextOverflow.clip,
             textAlign: TextAlign.center,
             style: TextStyle(

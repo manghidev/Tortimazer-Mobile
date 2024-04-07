@@ -8,7 +8,7 @@ class RouterSystem {
   static Future<Widget> routes() async {
     return MaterialApp(
       title: 'Tortimazer App',
-      initialRoute: '/login',
+      initialRoute: '/home',
       routes: {
         '/login': (_) => const LoginPage(),
         '/home': (_) => const HomePage(),
