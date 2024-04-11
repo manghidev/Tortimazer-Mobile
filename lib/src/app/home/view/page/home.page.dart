@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // * Providers
 import '/src/app/home/view/provider/model/socket_io.provider.dart';
@@ -27,41 +28,74 @@ class HomePage extends StatelessWidget {
         final count = Provider.of<CountTortillasViewModel>(context);
 
         socket.connection.on('connect_error', (data) {
-          count.error = true;
+          if (!count.isNotifiedError) {
+            count.isNotifiedError = true;
+            count.errorConnection = true;
+          }
         });
 
         socket.connection.on('connect', (data) {
-          count.error = false;
+          count.errorConnection = false;
+          count.isNotifiedError = false;
         });
 
         return Scaffold(
           backgroundColor: Colors.white,
-          appBar: AppBar(),
+          appBar: AppBar(
+            actions: [
+              IconButton(
+                onPressed: () {
+                  SharedPreferences.getInstance().then((preferences) {
+                    preferences
+                        .setBool('isLogged', false)
+                        .then((value) => Navigator.pushNamed(context, '/login'))
+                        .catchError(
+                          (_) => ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('An error occurred'),
+                            ),
+                          ),
+                        );
+                  });
+                },
+                icon: const Icon(Icons.logout),
+              ),
+            ],
+          ),
           body: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const TextWidget(),
-              if (count.error)
-                const Column(
-                  children: [
-                    Text(
-                      'Error connecting to service',
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
+              if (count.errorConnection)
+                const Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Error connecting to service',
+                        style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
                       ),
-                    ),
-                    Text('Please check your internet connection'),
-                    Text('Trying to reconnect'),
-                    SizedBox(height: 10),
-                    CircularProgressIndicator(
-                      color: Color(0xFF90CC76),
-                    )
-                  ],
+                      SizedBox(height: 10),
+                      Text(
+                        'The service is not available at the moment or the connection is unstable',
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 10),
+                      Text('Trying to reconnect in a few moments...'),
+                      SizedBox(height: 10),
+                      CircularProgressIndicator.adaptive(
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Color(0xFF90CC76)),
+                      )
+                    ],
+                  ),
                 ),
-              if (!count.error) const CountInputWidget(),
-              if (!count.error) const ManageCountWidget(),
+              if (!count.errorConnection) const CountInputWidget(),
+              if (!count.errorConnection) const ManageCountWidget(),
             ],
           ),
         );

@@ -1,13 +1,24 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CountTortillasViewModel extends ChangeNotifier {
-  int _count = 0;
+  int _count = 30;
   bool _isSending = false;
-  bool _error = false;
+  bool _errorConnection = false;
+  bool _isNotifiedError = false;
+
+  CountTortillasViewModel() {
+    getCount();
+  }
 
   late Timer timer = Timer(const Duration(seconds: 3), () {});
+
+  set count(int value) {
+    _count = value;
+    notifyListeners();
+  }
 
   int get count => _count;
 
@@ -44,10 +55,24 @@ class CountTortillasViewModel extends ChangeNotifier {
 
   bool get isSending => _isSending;
 
-  set error(bool value) {
-    _error = value;
+  set errorConnection(bool value) {
+    _errorConnection = value;
     notifyListeners();
   }
 
-  bool get error => _error;
+  bool get errorConnection => _errorConnection;
+
+  set isNotifiedError(bool value) {
+    _isNotifiedError = value;
+    notifyListeners();
+  }
+
+  bool get isNotifiedError => _isNotifiedError;
+
+  void getCount() {
+    SharedPreferences.getInstance().then((preferences) {
+      _count = preferences.getInt('count') ?? 30;
+      notifyListeners();
+    });
+  }
 }

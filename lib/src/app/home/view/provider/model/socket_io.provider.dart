@@ -9,7 +9,7 @@ class SocketIOProvider extends ChangeNotifier {
   }
 
   _initSocket() {
-    socket = IO.io("http://localhost:3001", <String, dynamic>{
+    socket = IO.io("http://3.145.56.143:3001", <String, dynamic>{
       'autoConnect': false,
       'transports': ['websocket'],
     });

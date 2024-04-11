@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+// * Providers
+import '/src/app/login/view/provider/model/login.provider.dart';
+
+// * View Models
+import '/src/app/login/view/provider/ui/login.view_model.dart';
 
 // * Widgets
 import '/src/app/login/view/widget/text_login.widget.dart';
@@ -17,28 +24,36 @@ class LoginPage extends StatelessWidget {
         child: SingleChildScrollView(
           child: SizedBox(
             height: MediaQuery.of(context).size.height,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const TextLoginWidget(),
-                const Center(
-                  child: LogoWidget(),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.height * 0.04,
-                  ),
-                  child: Container(
-                    color: const Color(0xFF88C16A),
-                    child: const Column(
-                      children: [
-                        InputsLoginWidget(),
-                        ButtonLoginWidget(),
-                      ],
-                    ),
-                  ),
-                )
+            child: MultiProvider(
+              providers: [
+                ChangeNotifierProvider(create: (_) => LoginViewModel()),
+                ChangeNotifierProvider(create: (_) => LoginProvider()),
               ],
+              builder: (context, child) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const TextLoginWidget(),
+                    const Center(
+                      child: LogoWidget(),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.height * 0.04,
+                      ),
+                      child: Container(
+                        color: const Color(0xFF88C16A),
+                        child: const Column(
+                          children: [
+                            InputsLoginWidget(),
+                            ButtonLoginWidget(),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                );
+              },
             ),
           ),
         ),

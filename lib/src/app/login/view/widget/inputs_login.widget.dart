@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+// * View Models
+import '/src/app/login/view/provider/ui/login.view_model.dart';
 
 class InputsLoginWidget extends StatelessWidget {
   const InputsLoginWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final loginViewModel = Provider.of<LoginViewModel>(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 20,
@@ -14,8 +20,8 @@ class InputsLoginWidget extends StatelessWidget {
         children: [
           TextField(
             decoration: InputDecoration(
-              labelText: 'Email',
-              hintText: 'Enter your email',
+              labelText: 'Username',
+              hintText: 'Enter your username',
               floatingLabelStyle: const TextStyle(
                 color: Colors.black,
               ),
@@ -29,6 +35,9 @@ class InputsLoginWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(0),
               ),
             ),
+            onChanged: (value) {
+              loginViewModel.userName = value;
+            },
           ),
           const SizedBox(height: 20),
           TextField(
@@ -45,6 +54,9 @@ class InputsLoginWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(0),
               ),
             ),
+            onChanged: (value) {
+              loginViewModel.password = value;
+            },
           ),
         ],
       ),

@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // * Providers
 import '/src/app/home/view/provider/model/socket_io.provider.dart';
@@ -15,10 +17,36 @@ class ManageCountWidget extends StatelessWidget {
     final count = Provider.of<CountTortillasViewModel>(context);
     final socket = Provider.of<SocketIOProvider>(context);
 
-    if (count.isSending) socket.emitEvent({'p': count.count});
+    late Timer timer = Timer(const Duration(seconds: 0), () {});
+
+    if (timer.isActive) timer.cancel();
+
+    if (count.isSending) {
+      socket.emitEvent({'p': count.count});
+
+      timer = Timer(const Duration(seconds: 15), () {
+        count.isSending = false;
+        SharedPreferences.getInstance().then((preferences) {
+          count.count = preferences.getInt('count') ?? 30;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Tormimazer not responding, try again later'),
+            ),
+          );
+        });
+      });
+    }
 
     socket.connection.on('server_to_clients_ok', (data) {
       count.isSending = false;
+      SharedPreferences.getInstance().then((preferences) {
+        preferences.setInt('count', count.count);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Tortimazer received the new number of tortillas'),
+          ),
+        );
+      });
     });
 
     return Row(
@@ -26,11 +54,9 @@ class ManageCountWidget extends StatelessWidget {
       children: [
         if (!count.isSending)
           GestureDetector(
-            onTap: count.isSending
-                ? null
-                : () {
-                    count.decrement();
-                  },
+            onTap: () {
+              count.decrement();
+            },
             child: Container(
               height: 50,
               width: 50,
@@ -50,18 +76,16 @@ class ManageCountWidget extends StatelessWidget {
               const Text('Send new number of tortillas to Tortimazer'),
             const SizedBox(height: 10),
             if (count.isSending)
-              const CircularProgressIndicator(
-                color: Color(0xFF90CC76),
+              const CircularProgressIndicator.adaptive(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF90CC76)),
               ),
           ],
         ),
         if (!count.isSending)
           GestureDetector(
-            onTap: count.isSending
-                ? null
-                : () {
-                    count.increment();
-                  },
+            onTap: () {
+              count.increment();
+            },
             child: Container(
               height: 50,
               width: 50,
