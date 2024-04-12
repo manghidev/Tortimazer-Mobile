@@ -41,11 +41,6 @@ class ManageCountWidget extends StatelessWidget {
       count.isSending = false;
       SharedPreferences.getInstance().then((preferences) {
         preferences.setInt('count', count.count);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Tortimazer received the new number of tortillas'),
-          ),
-        );
       });
     });
 
